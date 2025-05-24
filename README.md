@@ -44,3 +44,39 @@ This backend service is designed to manage user authentication, organization mem
 ```bash
 git clone https://github.com/your-repo/mlops_hypervisor.git
 cd mlops_hypervisor
+```
+
+### 2. Create and Activate Virtual Environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Initialize the Database
+
+## For SQLite (default):
+
+```bash
+python -c "from app.database import Base, engine; Base.metadata.create_all(bind=engine)"
+```
+
+## If you use migrations with Alembic:
+```bash
+alembic upgrade head
+```
+
+### 5. Run the application
+
+```bash
+uvicorn app.main:app --reload
+```
+
+
+
