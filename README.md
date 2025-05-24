@@ -61,13 +61,13 @@ pip install -r requirements.txt
 
 ### 4. Initialize the Database
 
-## For SQLite (default):
+#### For SQLite (default):
 
 ```bash
 python -c "from app.database import Base, engine; Base.metadata.create_all(bind=engine)"
 ```
 
-## If you use migrations with Alembic:
+#### If you use migrations with Alembic:
 ```bash
 alembic upgrade head
 ```
@@ -77,6 +77,8 @@ alembic upgrade head
 ```bash
 uvicorn app.main:app --reload
 ```
+
+## The API will be available at: http://127.0.0.1:8000
 
 
 
