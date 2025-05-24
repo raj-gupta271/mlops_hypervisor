@@ -1,9 +1,11 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app import models, schemas, auth, crud
+from app.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -30,4 +32,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     user = crud.get_user(db, form_data.username)
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    return {"access_token": user.username, "token_type": "bearer"}
+    access_token = create_access_token(
+        data={"sub": user.username},  # 'sub' = subject (standard JWT claim)
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me")
+def read_current_user(current_user: models.User = Depends(auth.get_current_user)):
+    return current_user
