@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from app.logger import log
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 def get_db():
     db = SessionLocal()
@@ -24,7 +24,7 @@ def get_current_user(db: Session, token: str):
         raise HTTPException(status_code=401, detail="Invalid token")
     return user
 
-@router.post("/deployments/", response_model=schemas.Deployment)
+@router.post("/deployment", response_model=schemas.Deployment)
 def create_deployment(
     deployment_in: schemas.DeploymentCreate,
     db: Session = Depends(get_db),
@@ -44,7 +44,7 @@ def create_deployment(
 
     return deployment
 
-@router.get("/deployments/", response_model=List[schemas.Deployment])
+@router.get("/deployments", response_model=List[schemas.Deployment])
 def list_deployments(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     log.info(f"token is {token}")
     current_user = get_current_user(db, token)

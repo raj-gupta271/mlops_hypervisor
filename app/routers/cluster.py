@@ -7,7 +7,7 @@ from app import models, schemas, crud
 from app.database import SessionLocal
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 def get_db():
     db = SessionLocal()

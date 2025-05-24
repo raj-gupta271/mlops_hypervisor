@@ -108,7 +108,6 @@ The scheduler:
 2. Checks available resources on the target cluster.
 3. Allocates resources if available and starts the deployment.
 4. Uses a preemption strategy to evict lower-priority deployments if necessary to accommodate higher-priority ones.
-5. Raises an error if no deployments can be scheduled due to resource constraints.
 
 ---
 
@@ -118,14 +117,8 @@ The scheduler:
 - Run tests using:
 
 ```bash
-pytest
+python -m pytest tests
 ```
-
----
-
-## License
-
-Specify your project license here.
 
 ---
 

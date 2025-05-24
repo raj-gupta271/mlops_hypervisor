@@ -8,7 +8,7 @@ from app import models, schemas, crud
 from app.database import SessionLocal
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 def get_db():
     db = SessionLocal()
@@ -35,7 +35,7 @@ def create_organization(org: schemas.OrgCreate, token: str = Depends(oauth2_sche
     db.commit()
     return {"org_id": db_org.id, "invite_code": db_org.invite_code}
 
-@router.post("/join/{invite_code}")
+@router.post("/organization/join/{invite_code}")
 def join_organization(invite_code: str, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     user = get_current_user(db, token)
     org = db.query(models.Organization).filter(models.Organization.invite_code == invite_code).first()

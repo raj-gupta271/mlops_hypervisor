@@ -9,7 +9,7 @@ from app.database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 def get_db():
     db = SessionLocal()
@@ -25,7 +25,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Username already registered")
     return crud.create_user(db, user)
 
-@router.post("/token")
+@router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user(db, form_data.username)
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
