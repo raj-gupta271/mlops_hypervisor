@@ -1,40 +1,52 @@
 
-# MLOps Hypervisor Backend Service
+# 🧠 MLOps Hypervisor Backend
 
-## Overview
-
-This backend service provides user authentication, organization and cluster management, deployment creation, and scheduling for an MLOps platform. The service schedules containerized deployments to clusters based on resource availability and priority.
+A backend service that manages user authentication, organizations, clusters, and deployment scheduling for MLOps workflows. Built with **FastAPI**, **SQLAlchemy**, **Redis**, **RQ**, and **RQ-Scheduler**.
 
 ---
 
-## Features
+## 🚀 Features
 
-- User registration and JWT-based authentication
-- Organization membership via invite codes
-- Cluster management with fixed resource tracking (CPU, RAM, GPU)
-- Deployment creation with resource requirements
-- Priority-based scheduling with resource optimization and preemption
-- REST API with OpenAPI docs via Swagger and ReDoc
+- ✅ **User Authentication** with JWT
+- 🏢 **Organization & User Management**
+- 📦 **Cluster Management**
+- ⚙️ **Deployment Lifecycle** (Create, Queue, Start, Fail)
+- 🧠 **Priority-Based Scheduling** with Preemption
+- 🧵 **Background Job Scheduling** using RQ & RQ-Scheduler
+- 🔒 **Role-Based Access Control**
+- 🐳 Dockerized setup (optional)
 
 ---
 
-## Setup and Run Instructions
+## 🛠️ Tech Stack
 
-### 1. Clone the repository
+- **FastAPI** — API framework
+- **SQLAlchemy** — ORM
+- **PostgreSQL / SQLite** — Database
+- **Redis** — In-memory job broker
+- **RQ / RQ-Scheduler** — Background job & scheduling
+- **JWT** — Auth
+- **Docker** — Containerization (optional)
+
+---
+
+## 📦 Setup Instructions
+
+### 1. Clone the Repo
 
 ```bash
-git clone https://github.com/yourusername/mlops_hypervisor.git
-cd mlops_hypervisor
+git clone https://github.com/your-org/mlops-hypervisor.git
+cd mlops-hypervisor
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create and Activate Virtual Environment
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate    # On Windows use: venv\Scripts\activate
+python -m venv venv
+source venv/bin/activate
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -54,30 +66,57 @@ If you use migrations with Alembic:
 alembic upgrade head
 ```
 
-### 5. Run the application
+### 5. Start Redis Server
+
+```bash
+redis-server
+```
+
+### 6. Start RQ Worker & Scheduler
+
+```bash
+# In one terminal
+rq worker
+
+# In another terminal
+rqscheduler
+```
+
+### 7. Start the FastAPI Server
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-The API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-
 ---
 
-## Usage
+## 📚 API Endpoints
 
-- Access interactive API docs:
+### 🔐 Auth
+
+- `POST /register` — Register a new user
+- `POST /login` — Get JWT access token
+
+### 🏢 Organization & User
+
+- `POST /organization/` — Create organization
+- `POST /organization/join/{invite_code}` — Add user to org
+
+### 🖥️ Cluster
+
+- `POST /cluster` — Create a cluster
+- `GET /clusters` — List all clusters
+
+### 🚀 Deployments
+
+- `POST /deployment` — Create deployment (goes into `QUEUED`)
+- `GET /deployments` — List deployments
+- Automatic scheduling every 30s based on cluster
+
+### Access interactive API docs:
 
   - Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
   - ReDoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-
-- Key API endpoints:
-
-  - `POST /register` — Register a new user
-  - `POST /token` — Obtain JWT access tokens
-  - `POST /organizations/join/{invite_code}` — Join an organization
-  - `/clusters` — Create, list, and manage clusters
-  - `/deployments` — Create and manage deployments
 
 ---
 
@@ -90,28 +129,26 @@ The API will be available at: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ---
 
-## Architecture Overview
+## 📅 Scheduling Logic
 
-- **FastAPI**: Web framework for REST APIs
-- **SQLAlchemy**: ORM for database interaction
-- **SQLite/PostgreSQL**: Database backend
-- **JWT**: Token-based authentication
-- **Scheduling Algorithm**: Priority-based deployment scheduling with resource preemption
-
----
-
-## Scheduling Algorithm Details
-
-The scheduler:
-
-1. Sorts queued deployments by priority (highest first).
-2. Checks available resources on the target cluster.
-3. Allocates resources if available and starts the deployment.
-4. Uses a preemption strategy to evict lower-priority deployments if necessary to accommodate higher-priority ones.
+- Scheduler jobs are created:
+  - **On cluster creation** (post-hook)
+  - **Once for each cluster**, running every 30 seconds
+- Uses RQ-scheduler to enqueue `scheduler_job(cluster_id)`
+- Scheduling respects:
+  - Deployment priority
+  - Cluster resource availability
+  - Preemption of lower-priority jobs if needed
 
 ---
 
-## Testing
+## 🐳 Docker (Optional)
+
+ - DockerFile
+
+---
+
+## 🧪 Tests
 
 - Unit tests cover key components like authentication, cluster management, deployment creation, and scheduling.
 - Run tests using:
@@ -122,6 +159,32 @@ python -m pytest tests
 
 ---
 
-## Contact
+## 📂 Project Structure
 
-For questions or support, contact: Your Name - abhijeet.raj271@gmail.com
+```
+app/
+├── main.py                # FastAPI entrypoint
+├── models.py              # SQLAlchemy models
+├── schemas.py             # Pydantic schemas
+├── crud.py                # DB operations
+├── database.py            # DB session & base
+├── routers/               # All API routes
+├── tasks.py               # Background jobs (scheduler_job)
+├── scheduler.py           # RQ-scheduler config
+├── security.py            # JWT Token generation
+```
+
+---
+
+## 📌 Requirements
+
+See [`requirements.txt`](./requirements.txt) for details.
+
+---
+
+## 👨‍💻 Author
+
+Abhijeet Raj  
+_Contact for any suggestions, issues, or contributions._ - abhijeet.raj271@gmail.com
+
+---
