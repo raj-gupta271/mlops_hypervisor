@@ -52,13 +52,27 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Start Redis Server
+### 4. Initialize the database
+
+For SQLite (default):
+
+```bash
+python -c "from app.database import Base, engine; Base.metadata.create_all(bind=engine)"
+```
+
+If you use migrations with Alembic:
+
+```bash
+alembic upgrade head
+```
+
+### 5. Start Redis Server
 
 ```bash
 redis-server
 ```
 
-### 5. Start RQ Worker & Scheduler
+### 6. Start RQ Worker & Scheduler
 
 ```bash
 # In one terminal
@@ -68,7 +82,7 @@ rq worker
 rqscheduler
 ```
 
-### 6. Start the FastAPI Server
+### 7. Start the FastAPI Server
 
 ```bash
 uvicorn app.main:app --reload
@@ -103,6 +117,15 @@ uvicorn app.main:app --reload
 
   - Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
   - ReDoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+---
+
+## Environment Variables (Optional)
+
+| Variable      | Description                 | Default                  |
+| ------------- | ---------------------------| ------------------------ |
+| `DATABASE_URL`| Database connection string | `sqlite:///./app.db`     |
+| `SECRET_KEY`  | JWT signing secret         | `your-secret-key`        |
 
 ---
 
@@ -162,10 +185,6 @@ See [`requirements.txt`](./requirements.txt) for details.
 ## 👨‍💻 Author
 
 Abhijeet Raj  
-_Contact for any suggestions, issues, or contributions._
-
-### Contact
-
-For questions or support, contact: Your Name - abhijeet.raj271@gmail.com
+_Contact for any suggestions, issues, or contributions._ - abhijeet.raj271@gmail.com
 
 ---
