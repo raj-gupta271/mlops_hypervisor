@@ -3,22 +3,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-
 from app import models, schemas, auth, crud
 from app.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
-from app.database import SessionLocal, engine
+from app.database import engine
+from app.auth import get_db
 
 models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):

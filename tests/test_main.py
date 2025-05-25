@@ -1,8 +1,6 @@
 from fastapi.testclient import TestClient # type: ignore
 from app.main import app
 from app.database import Base, engine, SessionLocal
-from app import models
-from app.logger import log
 
 client = TestClient(app)
 

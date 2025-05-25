@@ -2,25 +2,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
-
-from app import models, schemas, crud
-from app.database import SessionLocal
+from app.auth import get_db, get_current_user
+from app import schemas, crud
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-def get_current_user(db: Session, token: str):
-    user = crud.get_user(db, token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return user
 
 @router.post("/cluster")
 def create_cluster(cluster: schemas.ClusterCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):

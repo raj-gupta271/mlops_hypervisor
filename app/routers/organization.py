@@ -2,26 +2,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
+from app.auth import get_current_user, get_db
 import uuid
-
-from app import models, schemas, crud
-from app.database import SessionLocal
+from app import models, schemas
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-def get_current_user(db: Session, token: str):
-    user = crud.get_user(db, token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return user
 
 @router.post("/organization")
 def create_organization(org: schemas.OrgCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
