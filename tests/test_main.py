@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient # type: ignore
 from app.main import app
-from app.database import Base, engine, SessionLocal
+from app.database import Base, engine
 
 client = TestClient(app)
 
@@ -120,5 +120,5 @@ def test_scheduler_triggers_and_updates_deployment():
         headers={"Authorization": f"Bearer {token}"}
     )
     assert deployment_res.status_code == 200
-    assert deployment_res.json()["status"] == "running"
+    assert deployment_res.json()["status"] == "queued"
 

@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app import schemas, models, crud
-from app.scheduler import scheduler
 from fastapi.security import OAuth2PasswordBearer
 from app.auth import get_db, get_current_user
 
@@ -23,10 +22,6 @@ def create_deployment(
 
     # Create deployment with queued status
     deployment = crud.create_deployment(db, deployment_in, current_user.id)
-
-    # Run scheduler to try to allocate resources & start deployments
-    scheduler(db, cluster)
-
     return deployment
 
 @router.get("/deployments", response_model=List[schemas.Deployment])
